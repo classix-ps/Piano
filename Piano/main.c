@@ -19,12 +19,12 @@
 #define OCTAVE 12
 
 void drawPiano(sfRenderWindow* window, sfRectangleShape* keys[]) {
-  for (size_t i = 0, w = 0; i < WHITEKEYCOUNT + BLACKKEYCOUNT; i++) {
+  for (size_t i = 0; i < WHITEKEYCOUNT + BLACKKEYCOUNT; i++) {
     if (!((i % 12 < 4 && i % 2 == 1) || (i % 12 > 5 && i % 2 == 0))) {
       sfRenderWindow_drawRectangleShape(window, keys[i], NULL);
     }
   }
-  for (size_t i = 0, w = 0; i < WHITEKEYCOUNT + BLACKKEYCOUNT; i++) {
+  for (size_t i = 0; i < WHITEKEYCOUNT + BLACKKEYCOUNT; i++) {
     if ((i % 12 < 4 && i % 2 == 1) || (i % 12 > 5 && i % 2 == 0)) {
       sfRenderWindow_drawRectangleShape(window, keys[i], NULL);
     }
@@ -54,8 +54,10 @@ int main() {
   sfRenderWindow* window = sfRenderWindow_create(video, "Piano", sfDefaultStyle, NULL);
 
   /* KEYS */
-  sfRectangleShape* keys[WHITEKEYCOUNT + BLACKKEYCOUNT];
   bool pressedKeys[WHITEKEYCOUNT + BLACKKEYCOUNT];
+  memset(pressedKeys, false, (WHITEKEYCOUNT + BLACKKEYCOUNT) * sizeof(bool));
+
+  sfRectangleShape* keys[WHITEKEYCOUNT + BLACKKEYCOUNT];
 
   float keyBorder = 3.f;
 
@@ -87,8 +89,6 @@ int main() {
 
       w++;
     }
-
-    pressedKeys[i] = false;
   }
 
   /* SOUNDS */
@@ -148,11 +148,43 @@ int main() {
       if (e.type == sfEvtClosed) {
         sfRenderWindow_close(window);
       }
-      else if (e.type == sfEvtMouseMoved) {
-
-      }
       else if (e.type == sfEvtMouseButtonPressed) {
+        bool keyFound = false;
 
+        for (size_t i = 0; i < WHITEKEYCOUNT + BLACKKEYCOUNT && !keyFound; i++) {
+          if (((i % 12 < 4 && i % 2 == 1) || (i % 12 > 5 && i % 2 == 0))) {
+            sfFloatRect bounds = sfRectangleShape_getGlobalBounds(keys[i]);
+            if (sfFloatRect_contains(&bounds, (float)e.mouseButton.x, (float)e.mouseButton.y)) {
+              sfSound_play(sounds[i]);
+              sfRectangleShape_setFillColor(keys[i], sfColor_fromRGB(50, 50, 50));
+              pressedKeys[i] = true;
+              keyFound = true;
+            }
+          }
+        }
+        for (size_t i = 0; i < WHITEKEYCOUNT + BLACKKEYCOUNT && !keyFound; i++) {
+          if (!(i % 12 < 4 && i % 2 == 1) || (i % 12 > 5 && i % 2 == 0)) {
+            sfFloatRect bounds = sfRectangleShape_getGlobalBounds(keys[i]);
+            if (sfFloatRect_contains(&bounds, (float)e.mouseButton.x, (float)e.mouseButton.y)) {
+              sfSound_play(sounds[i]);
+              sfRectangleShape_setFillColor(keys[i], sfColor_fromRGB(200, 200, 200));
+              pressedKeys[i] = true;
+              keyFound = true;
+            }
+          }
+        }
+      }
+      else if (e.type == sfEvtMouseButtonReleased) {
+        for (size_t i = 0; i < WHITEKEYCOUNT + BLACKKEYCOUNT; i++) {
+          if ((i % 12 < 4 && i % 2 == 1) || (i % 12 > 5 && i % 2 == 0)) {
+            sfRectangleShape_setFillColor(keys[i], sfBlack);
+            pressedKeys[i] = false;
+          }
+          else {
+            sfRectangleShape_setFillColor(keys[i], sfWhite);
+            pressedKeys[i] = false;
+          }
+        }
       }
       else if (e.type == sfEvtKeyPressed) {
         if (e.key.code == sfKeyEscape) {
