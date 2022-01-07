@@ -233,14 +233,20 @@ int main() {
 
         sfColor resetColor = (val % 12 < 4 && val % 2 == 1) || (val % 12 > 5 && val % 2 == 0) ? sfBlack : sfWhite;
 
-        sfRectangleShape_setFillColor(keys[val - 12], resetColor);
-        pressedKeys[val - 12] = false;
+        if (pressedKeys[val - 12] == true) {
+          sfRectangleShape_setFillColor(keys[val - 12], resetColor);
+          pressedKeys[val - 12] = false;
+        }
 
-        sfRectangleShape_setFillColor(keys[val], resetColor);
-        pressedKeys[val] = false;
+        if (pressedKeys[val] == true) {
+          sfRectangleShape_setFillColor(keys[val], resetColor);
+          pressedKeys[val] = false;
+        }
 
-        sfRectangleShape_setFillColor(keys[val + 12], resetColor);
-        pressedKeys[val + 12] = false;
+        if (pressedKeys[val + 12] == true) {
+          sfRectangleShape_setFillColor(keys[val + 12], resetColor);
+          pressedKeys[val + 12] = false;
+        }
       }
 
       sfRenderWindow_clear(window, sfWhite);
