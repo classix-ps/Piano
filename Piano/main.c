@@ -117,6 +117,7 @@ int main() {
       soundBuffers[index-1] = sfSoundBuffer_createFromFile(filename);
       sounds[index-1] = sfSound_create();
       sfSound_setBuffer(sounds[index-1], soundBuffers[index-1]);
+      sfSound_setVolume(sounds[index-1], 25.f);
     }
   }
   closedir(dir);
@@ -157,6 +158,18 @@ int main() {
         if (e.key.code == sfKeyEscape) {
           sfRenderWindow_close(window);
           continue;
+        }
+        else if (e.key.code == sfKeyAdd) {
+          float newVolume = min(sfSound_getVolume(sounds[0]) + 5.f, 100.f);
+          for (size_t i = 0; i < WHITEKEYCOUNT + BLACKKEYCOUNT; i++) {
+            sfSound_setVolume(sounds[i], newVolume);
+          }
+        }
+        else if (e.key.code == sfKeySubtract) {
+          float newVolume = max(sfSound_getVolume(sounds[0]) - 5.f, 0.f);
+          for (size_t i = 0; i < WHITEKEYCOUNT + BLACKKEYCOUNT; i++) {
+            sfSound_setVolume(sounds[i], newVolume);
+          }
         }
 
         int val = getMapValue(keyMap, e.key.code);
