@@ -151,10 +151,13 @@ int main() {
       else if (e.type == sfEvtMouseButtonPressed) {
         bool keyFound = false;
 
+        sfVector2i mousePixel = { e.mouseButton.x, e.mouseButton.y };
+        sfVector2f mousePos = sfRenderWindow_mapPixelToCoords(window, mousePixel, sfRenderWindow_getDefaultView(window));
+
         for (size_t i = 0; i < WHITEKEYCOUNT + BLACKKEYCOUNT && !keyFound; i++) {
           if (((i % 12 < 4 && i % 2 == 1) || (i % 12 > 5 && i % 2 == 0))) {
             sfFloatRect bounds = sfRectangleShape_getGlobalBounds(keys[i]);
-            if (sfFloatRect_contains(&bounds, (float)e.mouseButton.x, (float)e.mouseButton.y)) {
+            if (sfFloatRect_contains(&bounds, mousePos.x, mousePos.y)) {
               sfSound_play(sounds[i]);
               sfRectangleShape_setFillColor(keys[i], sfColor_fromRGB(50, 50, 50));
               pressedKeys[i] = true;
@@ -165,7 +168,7 @@ int main() {
         for (size_t i = 0; i < WHITEKEYCOUNT + BLACKKEYCOUNT && !keyFound; i++) {
           if (!(i % 12 < 4 && i % 2 == 1) || (i % 12 > 5 && i % 2 == 0)) {
             sfFloatRect bounds = sfRectangleShape_getGlobalBounds(keys[i]);
-            if (sfFloatRect_contains(&bounds, (float)e.mouseButton.x, (float)e.mouseButton.y)) {
+            if (sfFloatRect_contains(&bounds, mousePos.x, mousePos.y)) {
               sfSound_play(sounds[i]);
               sfRectangleShape_setFillColor(keys[i], sfColor_fromRGB(200, 200, 200));
               pressedKeys[i] = true;
